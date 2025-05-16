@@ -1,0 +1,42 @@
+Perfromnace tunning issuse and Resolution: 
+
+1)  SQL PROFILE NOT ASSIGN PROPERLY :
+
+
+Situation: SQL profile not assign properly ?
+Task: Checked that and new profile is present but not assigned.
+Action: Check with xplain and find old one flash that for partuluer SQL ID and assign new Profile
+Result: SQL Query run smootlhy and redunce time upto 80% - 90%.
+
+2) 
+Situation: High Water Mark Affecting Full Table Scan Performance
+			- Table stored login and activity details for users. 
+			It had:
+				millions of rows inserted daily.
+				millions of rows deleted or updated daily based on session expiry.
+Task:  Segment still had thousands of unused blocks, causing Oracle to scan all blocks due to HWM.
+		Identify in AWR:
+		- High buffer gets
+		- Elevated db file scattered read events during peak logins.
+
+
+Action:  Enabled row movement , Shrunk table online to reset HWM , Rebuilt indexes ,Gathered statistics
+Result:  - Full scan time dropped from 10 seconds to 2 second.
+		 - Logical reads reduced by over 80% query.
+		 - DBA team scheduled monthly HWM cleanup for that table.
+		 
+3) 
+Situation: E-commerce application, users started noticing slow checkout performance, The issue was severe during
+			peak hours, and customers experienced delays when finalizing orders. After some investigation,
+			it was determined that one session was responsible for significantly slowing down the database
+Task:    Finding that Problematic Session
+Action: Check the session's wait events , the execution plan showed that the query was doing a full table scan on the 
+			order table, which had millions of rows. It was also suffering from high I/O contention due to buffer busy waits.
+			- optimize the Query:
+			- add Indexes to improve performance:
+			- created a composite index on ORDER_ITEMS table for the ORDER_ID and STATUS columns
+			- Force Index Usage
+			- Rebuild Indexes
+			
+Result: After implementing the index and query hint, the execution plan now used the index,
+			and the query’s response time dropped from 10 seconds to 1 seconds.
